@@ -11,8 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.Objects;
 
 @Controller
 public class UploadController {
@@ -27,8 +29,11 @@ public class UploadController {
     }
 
     @PostMapping("/uploadimage") public String uploadImage(Model model, @RequestParam("image") MultipartFile file, Principal principal) throws IOException {
-        var name = file.getOriginalFilename().replace(" ", "_");
-        var fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, name);
+        var name = Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, name);
+        if (!fileNameAndPath.toFile().getCanonicalPath().startsWith(UPLOAD_DIRECTORY)) {
+            throw new IOException("Could not upload file: " + name);
+        }
         Files.write(fileNameAndPath, file.getBytes());
         model.addAttribute("msg", "Uploaded images: " + name);
 
