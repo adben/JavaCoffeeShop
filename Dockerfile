@@ -1,6 +1,10 @@
-FROM maven:3-openjdk-11
+FROM maven:3-openjdk-11 as build
 RUN mkdir /usr/src/project
 COPY . /usr/src/project
 WORKDIR /usr/src/project
 RUN mvn package -DskipTests
-CMD mvn spring-boot:run
+
+FROM eclipse-temurin:11-jre
+COPY --from=build /usr/src/project/target/JavaCoffeeShop.jar /project/
+WORKDIR /project
+ENTRYPOINT java -jar JavaCoffeeShop.jar
