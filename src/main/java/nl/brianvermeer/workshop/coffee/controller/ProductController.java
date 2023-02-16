@@ -2,6 +2,7 @@ package nl.brianvermeer.workshop.coffee.controller;
 
 import nl.brianvermeer.workshop.coffee.domain.Product;
 import nl.brianvermeer.workshop.coffee.service.ProductService;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,7 +66,7 @@ public class ProductController {
     }
 
     @GetMapping("/direct")
-    public void directLink (@RequestParam String param, HttpServletResponse response) throws IOException {
+    public void directLink(@RequestParam String param, HttpServletResponse response) throws IOException {
         Product prod = productService.getProductByName(param);
         if (prod == null) {
             prod = new Product();
@@ -90,7 +91,7 @@ public class ProductController {
 
 
         writer.write(head);
-        writer.write("<div class=\"panel-heading\"><h1>"+ param + "</h1></div>");
+        writer.write("<div class=\"panel-heading\"><h1>" + StringEscapeUtils.escapeHtml4(param) + "</h1></div>");
 
         String output = "<div class=\"panel-body\">" +
                 "<ul>" +
@@ -100,7 +101,7 @@ public class ProductController {
                 "</ul>" +
                 "</div>";
 
-        writer.write(String.format(output, prod.getDescription(), prod.getProductType(), prod.getPrice()));
+        writer.write(String.format(output, StringEscapeUtils.escapeHtml4(prod.getDescription()), StringEscapeUtils.escapeHtml4(String.valueOf(prod.getProductType())), StringEscapeUtils.escapeHtml4(String.valueOf(prod.getPrice()))));
         writer.write(foot);
 
         response.getWriter().flush();
