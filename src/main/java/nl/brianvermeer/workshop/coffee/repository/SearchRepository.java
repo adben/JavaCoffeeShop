@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Locale;
 
 @Repository
-public class SearchRepository {
+public class
+SearchRepository {
 
     @Autowired
     EntityManager em;
@@ -20,8 +21,11 @@ public class SearchRepository {
 
     public List<Product> searchProduct (String input) {
         var lowerInput = input.toLowerCase(Locale.ROOT);
-        String query = "Select * from Product where lower(description) like '%" + lowerInput + "%' OR lower(product_name) like '%" + lowerInput + "%'";
-        var resultList = (List<Product>) em.createNativeQuery(query, Product.class).getResultList();
+        String querytext = "Select * from Product where lower(description) like CONCAT('%', ?1, '%') OR lower(product_name) like CONCAT('%', ?2, '%')";
+        var query = em.createNativeQuery(querytext, Product.class);
+        query.setParameter(1, lowerInput);
+        query.setParameter(2, lowerInput);
+        var resultList = (List<Product>) query.getResultList();
         return resultList;
     }
 
